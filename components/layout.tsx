@@ -1,29 +1,13 @@
-/**
- * Copyright 2020 Vercel Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import Link from 'next/link';
 import cn from 'classnames';
 import { useRouter } from 'next/router';
 import { SkipNavContent } from '@reach/skip-nav';
-import { NAVIGATION } from '@lib/constants';
+import { AUTHENTICATED_NAVIGATION, GUEST_NAVIGATION } from '@lib/constants';
 import styles from './layout.module.css';
 import Logo from './icons/icon-logo';
 import MobileMenu from './mobile-menu';
-import Footer, { HostedByVercel } from './footer';
 import ViewSource from '@components/view-source';
+import useAuth from '../lib/hooks/use-auth';
 
 type Props = {
   children: React.ReactNode;
@@ -35,6 +19,7 @@ type Props = {
 export default function Layout({ children, className, hideNav, layoutStyles }: Props) {
   const router = useRouter();
   const activeRoute = router.asPath;
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
@@ -46,26 +31,43 @@ export default function Layout({ children, className, hideNav, layoutStyles }: P
               <MobileMenu key={router.asPath} />
               <Link href="/">
                 {/* eslint-disable-next-line */}
-                <a className={styles.logo}>
-                  <Logo />
-                </a>
+                <div className={styles.logoContainer}>
+                  <a className={styles.logo}>
+                    <Logo />
+                  </a>
+                  <p>Prime Calendar</p>
+                </div>
               </Link>
             </div>
             <div className={styles.tabs}>
-              {NAVIGATION.map(({ name, route }) => (
-                <Link key={name} href={route}>
-                  <a
-                    className={cn(styles.tab, {
-                      [styles['tab-active']]: activeRoute.startsWith(route)
-                    })}
-                  >
-                    {name}
-                  </a>
-                </Link>
-              ))}
-            </div>
-            <div className={cn(styles['header-right'])}>
-              <HostedByVercel />
+              {isAuthenticated
+                ? [
+                    ...AUTHENTICATED_NAVIGATION.map(({ name, route }) => (
+                      <Link key={name} href={route}>
+                        <a
+                          className={cn(styles.tab, {
+                            [styles['tab-active']]: activeRoute.startsWith(route)
+                          })}
+                        >
+                          {name}
+                        </a>
+                      </Link>
+                    )),
+                    <a className={cn(styles.tab)} onClick={() => console.log('logout')}>
+                      LOGOUT
+                    </a>
+                  ]
+                : GUEST_NAVIGATION.map(({ name, route }) => (
+                    <Link key={name} href={route}>
+                      <a
+                        className={cn(styles.tab, {
+                          [styles['tab-active']]: activeRoute.startsWith(route)
+                        })}
+                      >
+                        {name}
+                      </a>
+                    </Link>
+                  ))}
             </div>
           </header>
         )}
@@ -74,7 +76,6 @@ export default function Layout({ children, className, hideNav, layoutStyles }: P
             <SkipNavContent />
             <div className={cn(styles.full, className)}>{children}</div>
           </main>
-          {!activeRoute.startsWith('/stage') && <Footer />}
         </div>
       </div>
     </>

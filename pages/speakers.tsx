@@ -17,7 +17,6 @@
 import { GetStaticProps } from 'next';
 
 import Page from '@components/page';
-import SpeakersGrid from '@components/speakers-grid';
 import Layout from '@components/layout';
 import Header from '@components/header';
 
@@ -29,7 +28,7 @@ type Props = {
   speakers: Speaker[];
 };
 
-export default function Speakers({ speakers }: Props) {
+export default function Speakers() {
   const meta = {
     title: 'Speakers - Virtual Event Starter Kit',
     description: META_DESCRIPTION
@@ -38,7 +37,6 @@ export default function Speakers({ speakers }: Props) {
     <Page meta={meta}>
       <Layout>
         <Header hero="Speakers" description={meta.description} />
-        <SpeakersGrid speakers={speakers} />
       </Layout>
     </Page>
   );

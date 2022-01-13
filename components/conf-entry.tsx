@@ -22,7 +22,7 @@ import LoadingDots from './loading-dots';
 import { register } from '@lib/user-api';
 import { SITE_DESCRIPTION } from '@lib/constants';
 import useEmailQueryParam from '@lib/hooks/use-email-query-param';
-import Captcha, {useCaptcha} from './captcha';
+import Captcha, { useCaptcha } from './captcha';
 
 type FormState = 'default' | 'loading' | 'error';
 
@@ -42,20 +42,28 @@ export default function ConfEntry({ onRegister }: { onRegister: () => void }) {
   const [focused, setFocused] = useState(false);
   const [formState, setFormState] = useState<FormState>('default');
   const [errorMsg, setErrorMsg] = useState('');
-  const {ref: captchaRef, reset: resetCaptcha, execute: executeCaptcha, isEnabled: isCaptchaEnabled} = useCaptcha();
+  const {
+    ref: captchaRef,
+    reset: resetCaptcha,
+    execute: executeCaptcha,
+    isEnabled: isCaptchaEnabled
+  } = useCaptcha();
 
-  const handleRegister = useCallback(async (token?: string) => {
-    const res = await register(emailInput, token);
+  const handleRegister = useCallback(
+    async (token?: string) => {
+      const res = await register(emailInput, token);
 
-    if (!res.ok) {
-      const json = await res.json();
-      setErrorMsg(getErrorMsg(json.error.code));
-      setFormState('error');
-      return;
-    }
+      if (!res.ok) {
+        const json = await res.json();
+        setErrorMsg(getErrorMsg(json.error.code));
+        setFormState('error');
+        return;
+      }
 
-    onRegister();
-  }, [emailInput, onRegister])
+      onRegister();
+    },
+    [emailInput, onRegister]
+  );
 
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -65,9 +73,9 @@ export default function ConfEntry({ onRegister }: { onRegister: () => void }) {
         setFormState('loading');
 
         if (isCaptchaEnabled) {
-          return executeCaptcha()
+          return executeCaptcha();
         }
-        
+
         return handleRegister();
       } catch (err) {
         console.error(err);
@@ -78,13 +86,16 @@ export default function ConfEntry({ onRegister }: { onRegister: () => void }) {
     [executeCaptcha, isCaptchaEnabled, handleRegister]
   );
 
-  const onTryAgainClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
+  const onTryAgainClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
 
-    setErrorMsg('');
-    setFormState('default');
-    resetCaptcha();
-  }, [resetCaptcha]);
+      setErrorMsg('');
+      setFormState('default');
+      resetCaptcha();
+    },
+    [resetCaptcha]
+  );
 
   useEmailQueryParam('login', setEmailInput);
 
@@ -94,31 +105,6 @@ export default function ConfEntry({ onRegister }: { onRegister: () => void }) {
       <h2 className={cn(styles.description)}>{SITE_DESCRIPTION}</h2>
       <form onSubmit={onSubmit} className={styles.form}>
         <div className={styles['form-row']}>
-          <label
-            htmlFor="email-input-field"
-            className={cn(styles['input-label'], {
-              [styles.focused]: focused,
-              [styles.error]: formState === 'error'
-            })}
-          >
-            {formState === 'error' ? (
-              <div className={cn(styles.input, styles['input-text'])}>{errorMsg}</div>
-            ) : (
-              <input
-                className={styles.input}
-                autoComplete="off"
-                type="email"
-                id="email-input-field"
-                value={emailInput}
-                onChange={e => setEmailInput(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                placeholder="Enter email to join the event"
-                aria-label="Your email address"
-                required
-              />
-            )}
-          </label>
           <button
             type="submit"
             className={cn(styles.submit, styles.register, styles[formState])}
@@ -132,10 +118,7 @@ export default function ConfEntry({ onRegister }: { onRegister: () => void }) {
             )}
           </button>
         </div>
-        <Captcha
-          ref={captchaRef}
-          onVerify={handleRegister}
-        />
+        <Captcha ref={captchaRef} onVerify={handleRegister} />
       </form>
     </div>
   );

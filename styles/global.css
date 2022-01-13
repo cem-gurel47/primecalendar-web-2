@@ -111,6 +111,7 @@ h1,
 h2,
 h3 {
   margin: 0;
+  color: #fff !important;
 }
 a {
   text-decoration: none;
