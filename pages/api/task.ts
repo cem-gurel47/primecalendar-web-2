@@ -4,19 +4,19 @@ import { ITaskCreate, ITaskUpdate } from '../../models/task';
 const endpoint = `${baseURL}task/`;
 
 class TaskService {
-  async getTasks(date: string, day: string) {
+  async getTasks(date: string, day: string, token: string) {
     try {
       const response = await axios.get(`${endpoint}date`, {
+        withCredentials: true,
         params: {
           date,
-          day
+          day,
+          token
         }
       });
       return response.data;
     } catch (error) {
-      //@ts-ignore
-      console.log(error);
-      throw error;
+      return ['error'];
     }
   }
 

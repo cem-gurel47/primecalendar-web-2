@@ -5,11 +5,11 @@ const endpoint = `${baseURL}user/`;
 class UserService {
   async login(email: string, password: string) {
     try {
+      axios.defaults.withCredentials = true;
       const response = await axios.post(`${endpoint}login`, {
         email,
         password
       });
-      localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       //@ts-ignore
@@ -25,9 +25,18 @@ class UserService {
         email,
         password
       });
-      localStorage.setItem('user', JSON.stringify(response.data));
 
       return response.data;
+    } catch (error) {
+      //@ts-ignore
+      throw error.response.data;
+    }
+  }
+
+  async logout() {
+    try {
+      await axios.post(`${endpoint}register`);
+      // return response.data;
     } catch (error) {
       //@ts-ignore
       throw error.response.data;

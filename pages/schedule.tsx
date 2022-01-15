@@ -1,5 +1,4 @@
-import { GetStaticProps } from 'next';
-
+import { GetServerSideProps } from 'next';
 import Page from '@components/page';
 import Schedule from '@components/schedule';
 import Layout from '@components/layout';
@@ -9,14 +8,15 @@ import ITask from '../models/task';
 
 type Props = {
   dailyTasks: ITask[];
+  test: string;
 };
 
-export default function SchedulePage({ dailyTasks }: Props) {
+export default function SchedulePage({ dailyTasks, test }: Props) {
   const meta = {
     title: 'Schedule',
     description: 'You can take a look at your schedule from this page and update it.'
   };
-  console.log(dailyTasks);
+  console.log(dailyTasks, test);
 
   return (
     <Page meta={meta}>
@@ -28,12 +28,15 @@ export default function SchedulePage({ dailyTasks }: Props) {
   );
 }
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
-  const dailyTasks = await TaskService.getTasks('11-01-2022', 'Thu');
+export const getServerSideProps: GetServerSideProps<Props> = async ctx => {
+  const cookie = ctx.req.headers.cookie || '';
+  const parsedCookie = cookie.split('jwt=')[1];
+  const dailyTasks = await TaskService.getTasks('11-01-2022', 'Thu', parsedCookie);
 
   return {
     props: {
-      dailyTasks
+      dailyTasks,
+      test: parsedCookie
     }
   };
 };

@@ -8,6 +8,7 @@ import Logo from './icons/icon-logo';
 import MobileMenu from './mobile-menu';
 import ViewSource from '@components/view-source';
 import useAuth from '../lib/hooks/use-auth';
+import Auth from '../pages/api/auth';
 
 type Props = {
   children: React.ReactNode;
@@ -53,7 +54,14 @@ export default function Layout({ children, className, hideNav, layoutStyles }: P
                         </a>
                       </Link>
                     )),
-                    <a className={cn(styles.tab)} onClick={() => console.log('logout')}>
+                    <a
+                      className={cn(styles.tab)}
+                      onClick={async () => {
+                        await Auth.logout();
+                        router.push('/');
+                      }}
+                      key="logout"
+                    >
                       LOGOUT
                     </a>
                   ]
